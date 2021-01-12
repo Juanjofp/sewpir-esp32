@@ -6,8 +6,8 @@
 #include "sewpir.hpp"
 
 // GPIO
-#define PIR_LEFT_PIN 12
-#define PIR_RIGHT_PIN 14
+#define PIR_LEFT_PIN 34
+#define PIR_RIGHT_PIN 35
 
 // Sensor ID
 uint8_t MPL[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
@@ -21,9 +21,8 @@ SewMQTT sewMQTT;
 
 // Publishers
 String MAC = WiFi.macAddress();
-String publishLeftPIR = MAC + "/TOGGLE/" + MAC + ":00:01/status";
-String publishRightPIR = MAC + "/TOGGLE/" + MAC + ":00:02/status";
-String publications[] = {publishLeftPIR, publishRightPIR};
+String publishPIR = MAC + "/status";
+String publications[] = {publishPIR};
 
 void onMQTTConnect() {
     Serial.println("Connected MQTT");
@@ -31,7 +30,7 @@ void onMQTTConnect() {
     SewParser::encodeToggle(frame, macLeftPIR, false);
     sewMQTT.publish(0, frame.frame, frame.size);
     SewParser::encodeToggle(frame, macRightPIR, false);
-    sewMQTT.publish(1, frame.frame, frame.size);
+    sewMQTT.publish(0, frame.frame, frame.size);
 }
 
 // PIR Sensors
@@ -39,9 +38,11 @@ SewPIR leftPIR(PIR_LEFT_PIN);
 SewPIR rightPIR(PIR_RIGHT_PIN);
 
 void onPIRRequest(WebServer& ws) {
-    String leftPIRStatus = leftPIR.isMotionDetected() ? "true" : "false";
-    String rightPIRStatus = rightPIR.isMotionDetected() ? "true" : "false";
-    ws.send(200, "application/json", "{\"leftPIR\": " + leftPIRStatus + ", \"rightPIR\": " + rightPIRStatus +"}");
+    String response = "{\"deviceId\": " + MAC + ", \"sensors\": [";
+    response += "{\"type\": \"TOGGLE\", \"sensorId\": \"" + MAC + ":00:01\"},";
+    response += "{\"type\": \"TOGGLE\", \"sensorId\": \"" + MAC + ":00:02\"}";
+    response += "]}";
+    ws.send(200, "application/json", response);
 }
 void onLeftPIRDetection(boolean isMotionDeteted) {
     FRAME frame;
@@ -51,7 +52,7 @@ void onLeftPIRDetection(boolean isMotionDeteted) {
 void onRightPIRDetection(boolean isMotionDeteted) {
     FRAME frame;
     SewParser::encodeToggle(frame, macRightPIR, rightPIR.isMotionDetected());
-    sewMQTT.publish(1, frame.frame, frame.size);
+    sewMQTT.publish(0, frame.frame, frame.size);
 }
 
 void setup()
@@ -61,10 +62,10 @@ void setup()
     // Try to connect to last WiFi
     initWifi();
     // Init WebServer + mqtt client
-    sewServer.addRequest("/pir", onPIRRequest);
+    sewServer.addRequest("/sensors", onPIRRequest);
     sewServer.initServer(&sewMQTT);
     sewMQTT.setSubscribers(NULL, 0);
-    sewMQTT.setPublishers(publications, 2);
+    sewMQTT.setPublishers(publications, 1);
     sewMQTT.initMQTT(NULL, onMQTTConnect);
     sewMQTT.reconnect();
 
