@@ -64,6 +64,16 @@ uint8_t HALFGPSANDDISTANCE[] = {
     0x57, 0x45, 0x53
 };
 
+uint8_t SIGNALFRAME[] = {
+    0x53, 0x45, 0x57, // Header
+    0x01, // Version
+    0x15, 0x00, // Size
+    0x02, 0x04, 0x0a, 0x0f, 0xae, 0x0e, 0x04, 0x06, // MAC
+    0x04, 0x00, // Type
+    0xca, 0xff, // Payload
+    0x57, 0x45, 0x53 // Tail
+};
+
 void printFrame(const char* msg, uint8_t frame[], int size) {
     printf("%s [", msg);
     for(int i = 0; i < size; i++) {
@@ -130,9 +140,14 @@ void printPayload(FRAME frame) {
         }
         case DISTANCE:{
             float value;
-            float &refValue = value;
-            SewParser::getDistancePayload(frame, refValue);
-            printf("DISTANCE [%f]\n\n", refValue);
+            SewParser::getDistancePayload(frame, value);
+            printf("DISTANCE [%f]\n\n", value);
+            break;
+        }
+        case SIGNAL:{
+            int16_t value;
+            SewParser::getSignalPayload(frame, value);
+            printf("SIGNAL [%d]\n\n", value);
             break;
         }
         default:
@@ -168,6 +183,9 @@ int main(void) {
     response = SewParser::encodeSwitch(frame, mac1, 1);
     printFrame("SWITCH", frame.frame, frame.size);
 
+    response = SewParser::encodeSignal(frame, mac1, -54);
+    printFrame("SIGNAL", frame.frame, frame.size);
+
 
     response = SewParser::encodeDCMotor(tmpFrame, mac1, 1, 0, 200);
     printFrameStruct(tmpFrame, 0);
@@ -176,6 +194,7 @@ int main(void) {
     response = sp.decodeFrameWithCallback(GPSANDDISTANCEFRAME, sizeof(GPSANDDISTANCEFRAME), printFrameStruct);
     response = sp.decodeFrameWithCallback(DISTANCEANDHALFGPS, sizeof(DISTANCEANDHALFGPS), printFrameStruct);
     response = sp.decodeFrameWithCallback(HALFGPSANDDISTANCE, sizeof(HALFGPSANDDISTANCE), printFrameStruct);
+    response = sp.decodeFrameWithCallback(SIGNALFRAME, sizeof(SIGNALFRAME), printFrameStruct);
 
 
     response = sp.decodeFrame(CMDTEMPERATUREFRAME, sizeof(CMDTEMPERATUREFRAME));

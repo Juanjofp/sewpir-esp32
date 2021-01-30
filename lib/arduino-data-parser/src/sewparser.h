@@ -23,6 +23,7 @@ class SewParser {
         static int encodeDCMotor(FRAME&, uint8_t[], uint8_t, uint8_t, uint8_t);
         static int encodeSwitch(FRAME&, uint8_t[], uint8_t);
         static int encodeToggle(FRAME&, uint8_t[], bool);
+        static int encodeSignal(FRAME&, uint8_t[], int16_t);
         // Create Commands frames
         static int encodeCMDTemperature(FRAME&, uint8_t[]);
         static int encodeCMDGPS(FRAME&, uint8_t[]);
@@ -31,11 +32,13 @@ class SewParser {
         static int encodeCMDDCMotor(FRAME&, uint8_t[]);
         static int encodeCMDSwitch(FRAME&, uint8_t[]);
         static int encodeCMDToggle(FRAME&, uint8_t[]);
+        static int encodeCMDSignal(FRAME&, uint8_t[]);
         // Get Payloads
         static int getSingleFloatPayload(FRAME, float&);
         static int getSingleUInt8Payload(FRAME, uint8_t&);
         static int getBooleanPayload(FRAME, bool&);
         static int getSingleUInt16Payload(FRAME, uint16_t&);
+        static int getSingleInt16Payload(FRAME, int16_t&);
         static int getTemperaturePayload(FRAME, float&);
         static int getHumidityPayload(FRAME, float&);
         static int getDistancePayload(FRAME, float&);
@@ -43,6 +46,7 @@ class SewParser {
         static int getTogglePayload(FRAME, bool&);
         static int getGPSPayload(FRAME, float[]);
         static int getDCMotorPayload(FRAME, uint8_t[]);
+        static int getSignalPayload(FRAME, int16_t&);
     private:
         uint8_t partialFrame[MAXBUFFER];
         int partialFrameSize;

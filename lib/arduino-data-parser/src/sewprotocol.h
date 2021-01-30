@@ -26,6 +26,7 @@
 #define TEMPERATURE 0x0001
 #define HUMIDUTY 0x0002
 #define DISTANCE 0x0003
+#define SIGNAL 0x0004
 #define GPS 0x000A
 #define DCMOTOR 0x0010
 #define SWITCH 0x0011
@@ -39,13 +40,13 @@ typedef union value_float {
 
 // UINT16 values
 typedef union value_uint16 {
-  uint8_t bytes[4];
+  uint8_t bytes[2];
   uint16_t value;
 } VALUE_UINT16;
 
 // Int16 values
 typedef union value_int16 {
-  uint8_t bytes[4];
+  uint8_t bytes[2];
   int16_t value;
 } VALUE_INT16;
 
@@ -73,6 +74,7 @@ int prepareDistanceFrame(FRAME&, uint8_t[], float);
 int prepareDCMotorFrame(FRAME&, uint8_t[], uint8_t, uint8_t, uint8_t);
 int prepareSwitchFrame(FRAME&, uint8_t[], uint8_t);
 int prepareToggleFrame(FRAME&, uint8_t[], bool);
+int prepareSignalFrame(FRAME&, uint8_t[], int16_t);
 // Create Commands frames
 int prepareEmptyGPSFrame(FRAME&, uint8_t[]);
 int prepareEmptyHumidityFrame(FRAME&, uint8_t[]);
@@ -81,6 +83,7 @@ int prepareEmptyDistanceFrame(FRAME&, uint8_t[]);
 int prepareEmptyDCMotorFrame(FRAME&, uint8_t[]);
 int prepareEmptySwitchFrame(FRAME&, uint8_t[]);
 int prepareEmptyToggleFrame(FRAME&, uint8_t[]);
+int prepareEmptySignalFrame(FRAME&, uint8_t[]);
 // helpers to create frames
 int prepareFloatFrame(FRAME&, uint8_t[], uint16_t, float);
 int prepareFrame(FRAME&, uint8_t, uint8_t[], uint16_t, uint8_t[], uint16_t);
@@ -92,6 +95,7 @@ int extendFrame(FRAME&);
 // Decode payloads
 int decodeSingleFloatPayload(FRAME, float&);
 int decodeSingleUInt8Payload(FRAME, uint8_t&);
+int decodeSingleInt16Payload(FRAME, int16_t&);
 int decodeBooleanPayload(FRAME, bool&);
 int decodeSingleUInt16Payload(FRAME, uint16_t&);
 int decodeTemperaturePayload(FRAME, float&);
@@ -101,4 +105,5 @@ int decodeSwitchPayload(FRAME, uint8_t&);
 int decodeTogglePayload(FRAME, bool&);
 int decodeGPSPayload(FRAME, float[]);
 int decodeDCMotorPayload(FRAME, uint8_t[]);
+int decodeSignalPayload(FRAME, int16_t&);
 #endif

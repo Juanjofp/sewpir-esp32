@@ -186,6 +186,10 @@ int SewParser::encodeToggle(FRAME& frame, uint8_t mac[], bool enabled) {
     return prepareToggleFrame(frame, mac, enabled);
 }
 
+int SewParser::encodeSignal(FRAME& frame, uint8_t mac[], int16_t signal) {
+    return prepareSignalFrame(frame, mac, signal);
+}
+
 int SewParser::encodeCMDTemperature(FRAME& frame, uint8_t mac[]) {
     return prepareEmptyTemperatureFrame(frame, mac);
 }
@@ -214,6 +218,10 @@ int SewParser::encodeCMDToggle(FRAME& frame, uint8_t mac[]) {
     return prepareEmptyToggleFrame(frame, mac);
 }
 
+int SewParser::encodeCMDSignal(FRAME& frame, uint8_t mac[]) {
+    return prepareEmptySignalFrame(frame, mac);
+}
+
 int SewParser::getGPSPayload(FRAME frame, float coords[]) {
     return decodeGPSPayload(frame, coords);
 }
@@ -238,6 +246,10 @@ int SewParser::getSingleUInt16Payload(FRAME frame, uint16_t &value) {
     return decodeSingleUInt16Payload(frame, value);
 }
 
+int SewParser::getSingleInt16Payload(FRAME frame, int16_t &value) {
+    return decodeSingleInt16Payload(frame, value);
+}
+
 int SewParser::getTemperaturePayload(FRAME frame, float &value) {
     return decodeTemperaturePayload(frame, value);
 }
@@ -256,4 +268,8 @@ int SewParser::getSwitchPayload(FRAME frame, uint8_t &value) {
 
 int SewParser::getTogglePayload(FRAME frame, bool &value) {
     return decodeTogglePayload(frame, value);
+}
+
+int SewParser::getSignalPayload(FRAME frame, int16_t &value) {
+    return decodeSignalPayload(frame, value);
 }

@@ -79,6 +79,13 @@ int prepareToggleFrame(FRAME &frame, uint8_t mac[], bool enabled) {
     return prepareV1Frame(frame, mac, TOGGLE, payload, sizeof(uint8_t));
 }
 
+int prepareSignalFrame(FRAME &frame, uint8_t mac[], int16_t signal) {
+    // PAYLOAD
+    VALUE_INT16 payload;
+    payload.value = signal;
+    return prepareV1Frame(frame, mac, SIGNAL, payload.bytes, sizeof(uint16_t));
+}
+
 int prepareV1Frame(FRAME &frame, uint8_t* mac, uint16_t type, uint8_t* payload, uint16_t size) {
     return prepareFrame(frame, 0x01, mac, type, payload, size);
 }
@@ -148,6 +155,10 @@ int prepareEmptySwitchFrame(FRAME &frame, uint8_t* mac) {
 
 int prepareEmptyToggleFrame(FRAME &frame, uint8_t* mac) {
     return prepareEmptyFrame(frame, 0x01, mac, TOGGLE);
+}
+
+int prepareEmptySignalFrame(FRAME &frame, uint8_t* mac) {
+    return prepareEmptyFrame(frame, 0x01, mac, SIGNAL);
 }
 
 int prepareEmptyFrame(FRAME &frame, uint8_t version, uint8_t* mac, uint16_t type) {
@@ -293,6 +304,17 @@ int decodeSingleUInt16Payload(FRAME frame, uint16_t &value) {
     return RETURNSUCCESS;
 }
 
+int decodeSingleInt16Payload(FRAME frame, int16_t &value) {
+    if(frame.payloadSize == 0) {
+        return ERRORCMDPAYLOAD;
+    }
+    VALUE_INT16 buffValue;
+    memcpy(buffValue.bytes, frame.frame + INDEXPAYLOAD, 2);
+    value = buffValue.value;
+
+    return RETURNSUCCESS;
+}
+
 int decodeSingleUInt8Payload(FRAME frame, uint8_t &value) {
     if(frame.payloadSize == 0) {
         return ERRORCMDPAYLOAD;
@@ -344,4 +366,11 @@ int decodeTogglePayload(FRAME frame, bool &value) {
         return ERRORINVALIDPAYLOAD;
     }
     return decodeBooleanPayload(frame, value);
+}
+
+int decodeSignalPayload(FRAME frame, int16_t &value) {
+    if(frame.type != SIGNAL) {
+        return ERRORINVALIDPAYLOAD;
+    }
+    return decodeSingleInt16Payload(frame, value);
 }
