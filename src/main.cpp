@@ -134,7 +134,7 @@ void handleDHT()
         FRAME frame;
         SewParser::encodeTemperature(frame, macTemperatureDHT, temperature);
         sewMQTT.publish(0, frame.frame, frame.size);
-        SewParser::encodeTemperature(frame, macHumidityDHT, humidity);
+        SewParser::encodeHumidity(frame, macHumidityDHT, humidity);
         sewMQTT.publish(0, frame.frame, frame.size);
         Serial.println("DHT: " + String(temperature, 10) + "ºC, " + String(humidity, 10) + "%");
     }
