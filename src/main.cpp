@@ -124,7 +124,7 @@ unsigned long lastDHTRead = 0;
 void handleDHT()
 {
     unsigned long now = millis();
-    if(now - lastDHTRead >= 4000) {
+    if(now - lastDHTRead >= 300000) {
         lastDHTRead = now;
         Serial.println("Time passed: " + String(now) + ", " + String(lastDHTRead));
         delay(sensorDHT.getMinimumSamplingPeriod());
